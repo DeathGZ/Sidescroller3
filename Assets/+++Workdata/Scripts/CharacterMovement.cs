@@ -18,13 +18,14 @@ public class CaracterMovement : MonoBehaviour
 
     private void Awake()
     {
-        inputActions = new Player_InputActions();  
+        inputActions = new Player_InputActions();
+        moveAction = inputActions.Player.Move;
     }
 
     private void OnEnable()
     {
         inputActions.Enable();
-        moveAction = inputActions.Player.Move;
+        
     }
 
     private void Update()
@@ -34,8 +35,8 @@ public class CaracterMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.velocity = new Vector2(moveInput.x * speed, moveInput.y * speed);
-
+        rb.velocity = new Vector2(moveInput.x * speed, moveInput.y * speed);         // move input wird auf der jeweiligen achsen,
+                                                                                    // mal speed (oben deklariert)
     }
 
 
