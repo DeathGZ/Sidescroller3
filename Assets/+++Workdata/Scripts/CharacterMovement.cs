@@ -15,6 +15,7 @@ public class CaracterMovement : MonoBehaviour
 
     public float speed = 5f;
     public Rigidbody2D rb;
+    public Animator anim;
 
     private void Awake()
     {
@@ -31,12 +32,19 @@ public class CaracterMovement : MonoBehaviour
     private void Update()
     {
         moveInput = moveAction.ReadValue<Vector2>();
+        if (moveInput.x != 0)
+        {
+            anim.SetFloat("MovementSpeed", 5);  
+        }
+        else
+        {
+            anim.SetFloat("MovementSpeed", 0);
+        }
     }
 
     private void FixedUpdate()
     {
-        rb.velocity = new Vector2(moveInput.x * speed, moveInput.y * speed);         // move input wird auf der jeweiligen achsen,
-                                                                                    // mal speed (oben deklariert)
+        rb.velocity = new Vector2(moveInput.x * speed, moveInput.y * speed);         // move input wird auf der jeweiligen achsen,                                                                              // mal speed (oben deklariert)
     }
 
 
