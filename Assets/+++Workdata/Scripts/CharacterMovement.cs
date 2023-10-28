@@ -4,24 +4,25 @@ using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine.InputSystem;
+using static UnityEngine.LightAnchor;
 
-public class CaracterMovement : MonoBehaviour
+public class CharacterMovement : MonoBehaviour
 {
-    #region Variables
     private Player_InputActions inputActions;/// <summary>                                             /// input action declaration                                             /// </summary>
     private InputAction moveAction;
     public InputAction jumpAction;
+    public float rollDistance = 10;
     public InputAction blockAction;
     public InputAction rollAction;
     public InputAction attackAction;
-    bool facingRight = true;
+    public bool facingRight = true;
     public Vector2 moveInput;
-    private SpriteRenderer spriteRenderer;
+    public float jumpStrength = 10;
+
     public float speed = 5f;
     public Rigidbody2D rb;
     public Animator anim;
-    public float jumpStrength;
-    #endregion
+    
 
 
     private void Awake()
@@ -45,7 +46,7 @@ public class CaracterMovement : MonoBehaviour
 
     private void Update()
     {
-       
+
         moveInput = moveAction.ReadValue<Vector2>();
         if (moveInput.x != 0)
         {
@@ -56,9 +57,10 @@ public class CaracterMovement : MonoBehaviour
             anim.SetFloat("MovementSpeed", 0);
         }
         if (facingRight == false && moveInput.x > 0)
-           Flip();
+            Flip();
         else if (facingRight == true && moveInput.x < 0)
-           Flip();
+            Flip();
+
 
         if (attackAction.triggered)
             Attack();
@@ -71,16 +73,24 @@ public class CaracterMovement : MonoBehaviour
 
         if (jumpAction.triggered)
             Jump();
-      
+
+
+        if (facingRight == false && moveInput.x > 0)
+            Flip();
+        else if (facingRight == true && moveInput.x < 0)
+            Flip();
+
+        
     }
 
-    private void FixedUpdate()
+   void FixedUpdate()
     {
-        rb.velocity = new Vector2(moveInput.x * speed, moveInput.y * speed);         // move input wird auf der jeweiligen achsen,                                                                              // mal speed (oben deklariert)
+        //rb.velocity = new Vector2(moveInput.x * speed, moveInput.y * speed);
+        rb.AddForce(moveInput.x * speed * Vector2.right);
     }
   
 
-    private void OnDisable()
+     void OnDisable()
     {
         inputActions.Disable();
         attackAction.Disable();
@@ -89,15 +99,17 @@ public class CaracterMovement : MonoBehaviour
         jumpAction.Disable();
     }
 
+    
+
     void Flip()
-    #region Voids
     {
+        //Flip player sprite
+
         facingRight = !facingRight;
         Vector3 scaler = transform.localScale;
         scaler.x *= -1;
         transform.localScale = scaler;
     }
-
     void Attack()
     {
         anim.SetTrigger("ActionTrigger");
@@ -114,12 +126,17 @@ public class CaracterMovement : MonoBehaviour
     {
         anim.SetTrigger("ActionTrigger");
         anim.SetInteger("Actionid", 11);
+        rb.velocity = new Vector2(0f, rb.velocity.y);
+        rb.velocity += new Vector2(transform.localScale.x, 0f) * rollDistance;
     }
 
     void Jump()
     {
         anim.SetTrigger("ActionTrigger");
         anim.SetInteger("Actionid", 9);
+        rb.velocity = new Vector2(rb.velocity.x, 0f);
+        rb.velocity += Vector2.up * jumpStrength;
     }
-    #endregion
+           
+     
 }
