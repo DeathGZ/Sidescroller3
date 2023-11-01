@@ -22,7 +22,7 @@ public class CharacterMovement : MonoBehaviour
     public float speed = 5f;
     public Rigidbody2D rb;
     public Animator anim;
-    
+
 
 
     private void Awake()
@@ -75,22 +75,16 @@ public class CharacterMovement : MonoBehaviour
             Jump();
 
 
-        if (facingRight == false && moveInput.x > 0)
-            Flip();
-        else if (facingRight == true && moveInput.x < 0)
-            Flip();
-
-        
     }
 
-   void FixedUpdate()
+    void FixedUpdate()
     {
         //rb.velocity = new Vector2(moveInput.x * speed, moveInput.y * speed);
         rb.AddForce(moveInput.x * speed * Vector2.right);
     }
-  
 
-     void OnDisable()
+
+    void OnDisable()
     {
         inputActions.Disable();
         attackAction.Disable();
@@ -99,7 +93,7 @@ public class CharacterMovement : MonoBehaviour
         jumpAction.Disable();
     }
 
-    
+
 
     void Flip()
     {
@@ -113,7 +107,7 @@ public class CharacterMovement : MonoBehaviour
     void Attack()
     {
         anim.SetTrigger("ActionTrigger");
-        anim.SetInteger("Actionid", 0);
+        anim.SetInteger("Actionid", 8);
     }
 
     void Block()
@@ -137,6 +131,6 @@ public class CharacterMovement : MonoBehaviour
         rb.velocity = new Vector2(rb.velocity.x, 0f);
         rb.velocity += Vector2.up * jumpStrength;
     }
-           
-     
+
+
 }
