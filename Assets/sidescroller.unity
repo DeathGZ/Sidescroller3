@@ -195,7 +195,7 @@ MonoBehaviour:
     m_Flags: 0
   facingRight: 1
   moveInput: {x: 0, y: 0}
-  jumpStrength: 5
+  jumpStrength: 7
   speed: 8
   rb: {fileID: 930568203}
   anim: {fileID: 930568205}
