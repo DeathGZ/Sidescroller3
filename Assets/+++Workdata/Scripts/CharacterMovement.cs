@@ -144,6 +144,7 @@ public class CharacterMovement : MonoBehaviour
         anim.SetInteger("Actionid", 11);
         rb.velocity = new Vector2(0f, rb.velocity.y);
         rb.velocity += new Vector2(transform.localScale.x, 0f) * rollDistance;
+        //Invoke("endRolling", endRolling.5f);
     }
 
     void Jump(CallbackContext ctx)
