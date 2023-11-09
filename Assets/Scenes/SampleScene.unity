@@ -2758,6 +2758,7 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
+  rollDistance: 10
   blockAction:
     m_Name: Block
     m_Type: 0
@@ -2785,11 +2786,15 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
+  facingRight: 1
+  feetSize: {x: 0.2, y: 0.09, z: 0}
+  isGrounded: 0
+  feetPosition: {x: 0, y: 0, z: 0}
   moveInput: {x: 0, y: 0}
+  jumpStrength: 10
   speed: 5
   rb: {fileID: 2099996481}
   anim: {fileID: 2099996476}
-  jumpStrength: 0
 --- !u!70 &2099996480
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
