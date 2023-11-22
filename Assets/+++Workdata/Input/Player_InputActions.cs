@@ -82,6 +82,15 @@ namespace UnityEngine.InputSystem
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RollAttack"",
+                    ""type"": ""Button"",
+                    ""id"": ""c37a7e3c-468e-4524-9ee9-b2f79b918689"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -269,6 +278,17 @@ namespace UnityEngine.InputSystem
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ef221e42-9863-49c0-a6df-56dd1314e89c"",
+                    ""path"": ""<Keyboard>/b"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RollAttack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -730,6 +750,7 @@ namespace UnityEngine.InputSystem
             m_Player_Block = m_Player.FindAction("Block", throwIfNotFound: true);
             m_Player_Roll = m_Player.FindAction("Roll", throwIfNotFound: true);
             m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+            m_Player_RollAttack = m_Player.FindAction("RollAttack", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -809,6 +830,7 @@ namespace UnityEngine.InputSystem
         private readonly InputAction m_Player_Block;
         private readonly InputAction m_Player_Roll;
         private readonly InputAction m_Player_Jump;
+        private readonly InputAction m_Player_RollAttack;
         public struct PlayerActions
         {
             private @Player_InputActions m_Wrapper;
@@ -819,6 +841,7 @@ namespace UnityEngine.InputSystem
             public InputAction @Block => m_Wrapper.m_Player_Block;
             public InputAction @Roll => m_Wrapper.m_Player_Roll;
             public InputAction @Jump => m_Wrapper.m_Player_Jump;
+            public InputAction @RollAttack => m_Wrapper.m_Player_RollAttack;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -846,6 +869,9 @@ namespace UnityEngine.InputSystem
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
+                @RollAttack.started += instance.OnRollAttack;
+                @RollAttack.performed += instance.OnRollAttack;
+                @RollAttack.canceled += instance.OnRollAttack;
             }
 
             private void UnregisterCallbacks(IPlayerActions instance)
@@ -868,6 +894,9 @@ namespace UnityEngine.InputSystem
                 @Jump.started -= instance.OnJump;
                 @Jump.performed -= instance.OnJump;
                 @Jump.canceled -= instance.OnJump;
+                @RollAttack.started -= instance.OnRollAttack;
+                @RollAttack.performed -= instance.OnRollAttack;
+                @RollAttack.canceled -= instance.OnRollAttack;
             }
 
             public void RemoveCallbacks(IPlayerActions instance)
@@ -1029,6 +1058,7 @@ namespace UnityEngine.InputSystem
             void OnBlock(InputAction.CallbackContext context);
             void OnRoll(InputAction.CallbackContext context);
             void OnJump(InputAction.CallbackContext context);
+            void OnRollAttack(InputAction.CallbackContext context);
         }
         public interface IUIActions
         {

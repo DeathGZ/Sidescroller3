@@ -1,136 +1,248 @@
-using UnityEngine;
-using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEngine.LightAnchor;
+using static UnityEngine.InputSystem.InputAction;
 
 public class CharacterMovement : MonoBehaviour
 {
-    private Player_InputActions inputActions;/// <summary>                                             /// input action declaration                                             /// </summary>
-    private InputAction moveAction;
-    public InputAction jumpAction;
-    public float rollDistance = 10;
-    public InputAction blockAction;
-    public InputAction rollAction;
-    public InputAction attackAction;
-    public bool facingRight = true;
-    public Vector2 moveInput;
-    public float jumpStrength = 10;
+    #region Private Variables
+    #region Input Variables
+    /// <summary>
+    /// Reference to the input actiom map file / Script
+    /// </summary>
+    private Player_InputActions inputActions;
 
-    public float speed = 5f;
+    private InputAction moveAction;
+    private InputAction rollAction;
+    private InputAction attackAction;
+    private InputAction jumpAction;
+    private InputAction rollAttackAction;   
+    #endregion
+    #endregion
+
+    #region Public Variables
     public Rigidbody2D rb;
     public Animator anim;
+    public SpriteRenderer spriteRenderer;
+    public LayerMask groundLayer;
 
+    public Vector3 groundcheckBoxSize;
+    public Vector3 groundcheckBoxPosition;
+    public Vector2 moveInput;
 
+    public float speed = 5f;
+    public float jumpForce;
+    public float rollForce;
+    public float health = 100;
 
+    public bool isGrounded;
+
+    public bool isFreezed;
+
+    public bool isRolling;
+
+    public bool isMoving;
+    #endregion
+
+    #region Unity Event Functions
     private void Awake()
     {
         inputActions = new Player_InputActions();
         moveAction = inputActions.Player.Move;
-        attackAction = inputActions.Player.Attack;
-        blockAction = inputActions.Player.Block;
         rollAction = inputActions.Player.Roll;
+        attackAction = inputActions.Player.Attack;  
         jumpAction = inputActions.Player.Jump;
+        rollAttackAction = inputActions.Player.RollAttack;    
     }
+
 
     private void OnEnable()
     {
         inputActions.Enable();
-        attackAction.Enable();
-        blockAction.Enable();
-        rollAction.Enable();
-        jumpAction.Enable();
+
+        moveAction.performed += Move;
+        moveAction.canceled += Move;
+
+        attackAction.performed += Attack;
+        rollAction.performed += Roll;
+        jumpAction.performed += Jump;
+        rollAttackAction.performed += RollAttack;
     }
 
-    private void Update()
-    {
+   
 
-        moveInput = moveAction.ReadValue<Vector2>();
-        if (moveInput.x != 0)
+    private void FixedUpdate()
+    {
+        if (isFreezed == true) { return; }
+        isGrounded = Physics2D.OverlapBox(gameObject.transform.position + groundcheckBoxPosition, groundcheckBoxSize, 0, groundLayer);
+
+        anim.SetBool("isGrounded", isGrounded);
+
+        if (!isRolling)
         {
-            anim.SetFloat("MovementSpeed", 5);
+            rb.velocity = new Vector2(moveInput.x * speed, rb.velocity.y);
+        }
+    }
+
+    private void LateUpdate()
+    {
+        anim.SetBool("isGrounded", isGrounded);
+    }
+
+    private void OnDisable()
+    {
+        inputActions.Disable();
+
+        moveAction.performed -= Move;
+        moveAction.canceled -= Move;
+
+        attackAction.performed -= Attack;
+        rollAction.performed -= Roll;
+        jumpAction.performed -= Jump;
+        rollAttackAction.performed -= RollAttack;
+    }
+    #endregion
+
+    void Move(CallbackContext ctx)
+    {
+        
+        moveInput = moveAction.ReadValue<Vector2>();
+
+        if (ctx.performed)
+        {
+            isMoving = true;
         }
         else
         {
-            anim.SetFloat("MovementSpeed", 0);
+            isMoving = false;
         }
-        if (facingRight == false && moveInput.x > 0)
-            Flip();
-        else if (facingRight == true && moveInput.x < 0)
-            Flip();
 
+        {
+            if (moveInput.x < 0)
+            {
+                spriteRenderer.flipX = true;
+            }
+            else if (moveInput.x > 0)
+            {
+                spriteRenderer.flipX = false;
+            }
 
-        if (attackAction.triggered)
-            Attack();
+            if (moveInput.x != 0)
+            {
+                anim.SetFloat("MovementSpeed", 5);
+            }
+            else
+            {
+                anim.SetFloat("MovementSpeed", 0);
+            }
 
-        if (blockAction.triggered)
-            Block();
-
-        if (rollAction.triggered)
-            Roll();
-
-        if (jumpAction.triggered)
-            Jump();
-
-
+        }
     }
 
-    void FixedUpdate()
+    void Attack(CallbackContext ctx)
     {
-        //rb.velocity = new Vector2(moveInput.x * speed, moveInput.y * speed);
-        rb.AddForce(moveInput.x * speed * Vector2.right);
+        if (isGrounded)
+        {
+            if (!isRolling)
+            {
+                AnimationCallAction(10);
+            }
+            else
+            {
+                AnimationCallAction(11);
+            }
+        }
+        
+      
     }
 
-
-    void OnDisable()
+    void Roll(CallbackContext ctx)
     {
-        inputActions.Disable();
-        attackAction.Disable();
-        blockAction.Disable();
-        rollAction.Disable();
-        jumpAction.Disable();
+        if (!isRolling && isGrounded)
+        {
+            isRolling = true;
+
+            if (spriteRenderer.flipX)
+            {
+                rb.AddForce(new Vector2(-rollForce, 0), ForceMode2D.Impulse);
+            }
+            else
+            {
+                rb.AddForce(new Vector2(rollForce, 0), ForceMode2D.Impulse);
+            }
+            
+            Invoke("EndRolling", 0.5f);
+            AnimationCallAction(11);
+        }
+       
     }
 
-
-
-    void Flip()
+    void RollAttack(CallbackContext ctx)
     {
-        //Flip player sprite
+        if (!isRolling)
+        {
+            isRolling = true;
 
-        facingRight = !facingRight;
-        Vector3 scaler = transform.localScale;
-        scaler.x *= -1;
-        transform.localScale = scaler;
+            if (spriteRenderer.flipX)
+            {
+                rb.AddForce(new Vector2(-rollForce, 0), ForceMode2D.Impulse);
+            }
+            else
+            {
+                rb.AddForce(new Vector2(rollForce, 0), ForceMode2D.Impulse);
+            }
+
+            Invoke("EndRolling", 0.5f);
+            AnimationCallAction(1);
+        }
+
     }
-    void Attack()
+
+    public void EndRolling()
+    {
+        isRolling = false;
+    }
+
+    void Jump(CallbackContext ctx)
+    {   
+        if (isGrounded)
+        {
+            rb.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
+
+            AnimationCallAction(2);
+        }
+       
+    }
+
+    void AnimationCallAction(int id)
     {
         anim.SetTrigger("ActionTrigger");
-        anim.SetInteger("Actionid", 8);
+        anim.SetInteger("ActionId", id);
     }
 
-    void Block()
+    public void GetDmg()
     {
-        anim.SetTrigger("ActionTrigger");
-        anim.SetInteger("Actionid", 10);
+        print("Game Over");
+
+        AnimationCallAction(4);
     }
 
-    void Roll()
+    public void Freeze()
     {
-        anim.SetTrigger("ActionTrigger");
-        anim.SetInteger("Actionid", 11);
-        rb.velocity = new Vector2(0f, rb.velocity.y);
-        rb.velocity += new Vector2(transform.localScale.x, 0f) * rollDistance;
+        AnimationCallAction(5);
     }
 
-    void Jump()
+    private void OnDrawGizmos()
     {
-        anim.SetTrigger("ActionTrigger");
-        anim.SetInteger("Actionid", 9);
-        rb.velocity = new Vector2(rb.velocity.x, 0f);
-        rb.velocity += Vector2.up * jumpStrength;
+        Gizmos.DrawWireCube(gameObject.transform.position + groundcheckBoxPosition, groundcheckBoxSize);
     }
 
+    public void death()
+    {
+        Destroy(gameObject, 1f);
+        anim.SetTrigger("Death");
+    }
 
 }
