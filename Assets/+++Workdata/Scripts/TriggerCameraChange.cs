@@ -24,5 +24,7 @@ public class TriggerCameraChange : MonoBehaviour
             triggerCamera.Priority = 0;
         }
     }
+
+
 }
 

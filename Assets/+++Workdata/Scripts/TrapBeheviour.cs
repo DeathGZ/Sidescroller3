@@ -12,12 +12,12 @@ public class TrapBeheviour : MonoBehaviour
             Debug.Log("playerFreeze");
             CharacterMovement cM = col.GetComponent<CharacterMovement>();
             col.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
-            StartCoroutine(freeze(cM) );
+            StartCoroutine(Freeze(cM) );
         }
                               
     }
 
-    IEnumerator freeze(CharacterMovement _cM)
+    IEnumerator Freeze(CharacterMovement _cM)
     {
         _cM.isFreezed = true;
 
