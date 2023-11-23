@@ -44,3 +44,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: BGGrass
+    uniqueID: 3713367245
+    locked: 0
+  - name: BG
+    uniqueID: 4240835851
+    locked: 0
+  - name: Ground
+    uniqueID: 4010396333
+    locked: 0
+  - name: Player
+    uniqueID: 861582907
+    locked: 0
+  - name: Grass
+    uniqueID: 6144199
+    locked: 0
